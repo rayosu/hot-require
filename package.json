@@ -1,0 +1,16 @@
+{
+    "name": "hot-require",
+    "version": "0.0.1",
+    "description": "hot-reload when js file change",
+    "keywords":[
+        "hot-require","hot-reload","reload","require"
+    ],
+    "author": "Surui <surui.cc@gmail.com> (http://www.surui.cc)",
+    "license": "MIT",
+    "main": "hot-require.js",
+    "repository": {
+        "type":"git",
+        "url":"https://github.com/rayosu/hot-require"
+    },
+    "readmeFilename": "README.md"
+}
