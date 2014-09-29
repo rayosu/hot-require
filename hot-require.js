@@ -1,5 +1,7 @@
 /**
  * Created by Surui on 2014/9/26.
+ * E-Mail: surui.cc@gmail.com
+ * github: https://github.com/rayosu/hot-require
  *
  */
 var fs = require('fs');
