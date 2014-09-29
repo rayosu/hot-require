@@ -1,11 +1,13 @@
 /**
  * Created by Surui on 2014/9/26.
- * E-Mail: surui.cc@gmail.com
- * github: https://github.com/rayosu/hot-require
+ *
  */
 var fs = require('fs');
+var _cache = {};
 global._require = function (dirname, path) {
     var _path = require.resolve(dirname + '/' + path);
+    if(_cache[_path]) return _cache[_path];
+
     var RealClass = require(_path);
     // constructor[execute property proxy handler when create Object]
     var Proxy = function () {
@@ -63,5 +65,7 @@ global._require = function (dirname, path) {
         RealClass = require(_path);
         console.log('update js: ' + _path);
     });
+
+    _cache[_path] = Proxy;
     return Proxy;
 };
