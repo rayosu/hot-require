@@ -6,6 +6,36 @@
  */
 var fs = require('fs');
 var _cache = {};
+var copyProperty = function(target, source){
+    // proxy static function
+    for (var key in source) {
+        var property = source[key];
+        if (typeof property == "function") {
+            target[key] = function (_key) {
+                return function () {
+                    console.log('invoke static method: ' + _key);
+                    source[_key].apply(source, arguments);
+                }
+            }(key)
+        } else {
+            // invalid when target is prototype
+            Object.defineProperty(target, key, {
+                get: function (_key) {
+                    return function () {
+                        console.log('getter: ' + _key);
+                        return source[_key];
+                    }
+                }(key),
+                set: function (_key) {
+                    return function (value) {
+                        console.log('setter: ' + _key + ' ,value: ' + value);
+                        source[_key] = value;
+                    }
+                }(key)
+            })
+        }
+    }
+};
 global._require = function (dirname, path) {
     var _path = require.resolve(dirname + '/' + path);
     if(_cache[_path]) return _cache[_path];
@@ -15,51 +45,12 @@ global._require = function (dirname, path) {
     var Proxy = function () {
         var realObj = new RealClass(arguments);
         // proxy all realObj's property[field and method], use getter/setter on field, and use function proxy on function
-        for (var propertyName in realObj) {
-            var property = realObj[propertyName];
-            if (typeof property == "function") {
-                this[propertyName] = function (_propertyName) {
-                    return function () {
-                        console.log('invoke property method: ' + _propertyName);
-                        realObj[_propertyName].apply(realObj, arguments);
-                    }
-                }(propertyName);
-            } else {
-                Object.defineProperty(this, propertyName, {
-                    get: function (_propertyName) {
-                        return function () {
-                            console.log('getter: ' + _propertyName);
-                            return realObj[_propertyName];
-                        }
-                    }(propertyName),
-                    set: function (_propertyName) {
-                        return function (value) {
-                            console.log('setter: ' + _propertyName + ' ,value: ' + value);
-                            realObj[_propertyName] = value;
-                        }
-                    }(propertyName)
-                })
-            }
-        }
+        copyProperty(this, realObj);
     };
     // proxy static function
-    for (var key in RealClass) {
-        Proxy[key] = function (_key) {
-            return function () {
-                console.log('invoke static method: ' + _key);
-                RealClass[_key].apply(RealClass, arguments);
-            }
-        }(key)
-    }
+    copyProperty(Proxy, RealClass);
     // proxy prototype function
-    for (var key in RealClass.prototype) {
-        Proxy.prototype[key] = function (_key) {
-            return function () {
-                console.log('invoke method: ' + _key);
-                RealClass.prototype[_key].apply(RealClass, arguments);
-            }
-        }(key)
-    }
+    copyProperty(Proxy.prototype, RealClass.prototype);
     // use 'watchFile' and not 'watch' to keep the callback invoke once one time when the file change.
     fs.watchFile(_path, function () {
         delete require.cache[_path];
