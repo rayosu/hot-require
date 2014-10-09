@@ -13,7 +13,7 @@ var copyProperty = function(target, source){
         if (typeof property == "function") {
             target[key] = function (_key) {
                 return function () {
-                    console.log('invoke static method: ' + _key);
+//                    console.log('invoke method: ' + _key);
                     source[_key].apply(source, arguments);
                 }
             }(key)
@@ -22,13 +22,13 @@ var copyProperty = function(target, source){
             Object.defineProperty(target, key, {
                 get: function (_key) {
                     return function () {
-                        console.log('getter: ' + _key);
+//                        console.log('getter: ' + _key);
                         return source[_key];
                     }
                 }(key),
                 set: function (_key) {
                     return function (value) {
-                        console.log('setter: ' + _key + ' ,value: ' + value);
+//                        console.log('setter: ' + _key + ' ,value: ' + value);
                         source[_key] = value;
                     }
                 }(key)
