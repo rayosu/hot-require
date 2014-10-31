@@ -7,6 +7,7 @@ proxy the target js object(use hot-require), update realSubject function and fie
 because the code in memory are use the proxySubject, so all old instance can be updated when realSubject change.
 
 Install
+
     npm install hot-require
 
 Example

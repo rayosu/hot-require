@@ -14,7 +14,7 @@ var copyProperty = function(target, source){
             target[key] = function (_key) {
                 return function () {
 //                    console.log('invoke method: ' + _key);
-                    source[_key].apply(source, arguments);
+                    return source[_key].apply(source, arguments);
                 }
             }(key)
         } else {
