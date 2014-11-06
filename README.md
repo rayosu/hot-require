@@ -17,3 +17,6 @@ Example
 
     // you can use the global function _require to require your js file.
     var yourJs = _require(__dirname, '[module or js name you want to hot reload]');
+    
+    since 0.0.7 you can call it without __dirname:
+    var yourJs = _require('[module or js name you want to hot reload]');

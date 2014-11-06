@@ -5,8 +5,10 @@
  *
  */
 var fs = require('fs');
+var path = require('path');
+var callsites = require('callsites');
 var _cache = {};
-var copyProperty = function(target, source){
+var copyProperty = function (target, source) {
     // proxy static function
     for (var key in source) {
         var property = source[key];
@@ -36,9 +38,14 @@ var copyProperty = function(target, source){
         }
     }
 };
-global._require = function (dirname, path) {
-    var _path = require.resolve(dirname + '/' + path);
-    if(_cache[_path]) return _cache[_path];
+global._require = function (modulePath) {
+    var callerPath = callsites()[1].getFileName();
+    if (arguments.length == 2) {
+        console.warn('since 0.0.7 you can use _require(\'path/to/your.js\') without __dirname in file: ' + callerPath);
+        modulePath = arguments[1];
+    }
+    var _path = require.resolve(path.dirname(callerPath) + '/' + modulePath);
+    if (_cache[_path]) return _cache[_path];
 
     var RealClass = require(_path);
     // constructor[execute property proxy handler when create Object]
