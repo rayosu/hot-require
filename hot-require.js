@@ -8,7 +8,7 @@ var fs = require('fs');
 var path = require('path');
 var callsites = require('callsites');
 var _cache = {};
-var copyProperty = function (target, source) {
+var _copyProperty = function (target, source) {
     // proxy static function
     for (var key in source) {
         var property = source[key];
@@ -37,7 +37,15 @@ var copyProperty = function (target, source) {
             })
         }
     }
+    // proxy prototype function
+    _copyProperty(Proxy.prototype, RealClass.prototype);
 };
+var _hasKey = function(obj){
+    for (var key in obj){
+        return true;
+    }
+    return false;
+}
 global._require = function (modulePath) {
     var callerPath = callsites()[1].getFileName();
     if (arguments.length == 2) {
@@ -52,17 +60,23 @@ global._require = function (modulePath) {
     var Proxy = function () {
         var realObj = new RealClass(arguments);
         // proxy all realObj's property[field and method], use getter/setter on field, and use function proxy on function
-        copyProperty(this, realObj);
+        _copyProperty(this, realObj);
     };
-    // proxy static function
-    copyProperty(Proxy, RealClass);
-    // proxy prototype function
-    copyProperty(Proxy.prototype, RealClass.prototype);
+    if(!_hasKey(RealClass)){
+        process.nextTick(function(){
+            RealClass = require(_path);
+            _copyProperty(Proxy, RealClass);
+        });
+    } else {
+        // proxy static function
+        _copyProperty(Proxy, RealClass);
+    }
     // use 'watchFile' and not 'watch' to keep the callback invoke once one time when the file change.
     fs.watchFile(_path, function () {
         delete require.cache[_path];
         // update new js file
         RealClass = require(_path);
+        _copyProperty(Proxy, RealClass);
         console.log('update js: ' + _path);
     });
 

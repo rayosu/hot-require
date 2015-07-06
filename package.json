@@ -1,6 +1,6 @@
 {
   "name": "hot-require",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "hot-reload when js file change",
   "keywords": [
     "hot-require",
