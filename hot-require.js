@@ -37,11 +37,13 @@ var _copyProperty = function (target, source) {
             })
         }
     }
-    // proxy prototype function
-    _copyProperty(Proxy.prototype, RealClass.prototype);
+    if (target.prototype && source.prototype) {
+        // proxy prototype function
+        _copyProperty(target.prototype, source.prototype);
+    }
 };
-var _hasKey = function(obj){
-    for (var key in obj){
+var _hasKey = function (obj) {
+    for (var key in obj) {
         return true;
     }
     return false;
@@ -62,8 +64,8 @@ global._require = function (modulePath) {
         // proxy all realObj's property[field and method], use getter/setter on field, and use function proxy on function
         _copyProperty(this, realObj);
     };
-    if(!_hasKey(RealClass)){
-        process.nextTick(function(){
+    if (!_hasKey(RealClass)) {
+        process.nextTick(function () {
             RealClass = require(_path);
             _copyProperty(Proxy, RealClass);
         });
