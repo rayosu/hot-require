@@ -2,6 +2,7 @@ hot-require
 
 NodeJs服务器代码热更新
 hot require js code without restart server for NodeJs
+
 =============
 
 使用代理的方式让所有类和实例能够在js文件更改后, 对被代理对象进行替换, 实现热更新.
